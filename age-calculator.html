@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Age Calculator</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    padding: 40px;
+    width: 100%;
+    max-width: 420px;
+  }
+
+  h1 {
+    text-align: center;
+    color: #2d2d2d;
+    font-size: 26px;
+    margin-bottom: 8px;
+  }
+
+  p.subtitle {
+    text-align: center;
+    color: #777;
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+
+  label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 8px;
+  }
+
+  input[type="date"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 20px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input[type="date"]:focus {
+    border-color: #2575fc;
+  }
+
+  button {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(37, 117, 252, 0.35);
+  }
+
+  button:active {
+    transform: translateY(0);
+  }
+
+  #error {
+    color: #d93025;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 12px;
+    display: none;
+  }
+
+  #result {
+    margin-top: 28px;
+    display: none;
+  }
+
+  .result-main {
+    text-align: center;
+    background: #f4f6ff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .result-main .big-number {
+    font-size: 42px;
+    font-weight: 700;
+    color: #2575fc;
+    line-height: 1;
+  }
+
+  .result-main .label {
+    font-size: 14px;
+    color: #666;
+    margin-top: 6px;
+  }
+
+  .breakdown {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .breakdown div {
+    flex: 1;
+    text-align: center;
+    background: #fafafa;
+    border-radius: 10px;
+    padding: 12px 8px;
+    border: 1px solid #eee;
+  }
+
+  .breakdown .num {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+  }
+
+  .breakdown .txt {
+    font-size: 12px;
+    color: #888;
+    margin-top: 4px;
+  }
+
+  .extra {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 13px;
+    color: #666;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Age Calculator</h1>
+  <p class="subtitle">Find out exactly how old you are</p>
+
+  <label for="birthdate">Enter your date of birth</label>
+  <input type="date" id="birthdate">
+
+  <button onclick="calculateAge()">Calculate age</button>
+
+  <p id="error">Please select a valid date of birth (not in the future).</p>
+
+  <div id="result">
+    <div class="result-main">
+      <div class="big-number" id="yearsOld">0</div>
+      <div class="label">years old</div>
+    </div>
+
+    <div class="breakdown">
+      <div>
+        <div class="num" id="months">0</div>
+        <div class="txt">months</div>
+      </div>
+      <div>
+        <div class="num" id="days">0</div>
+        <div class="txt">days</div>
+      </div>
+      <div>
+        <div class="num" id="totalDays">0</div>
+        <div class="txt">total days</div>
+      </div>
+    </div>
+
+    <div class="extra" id="nextBirthday"></div>
+  </div>
+</div>
+
+<script>
+  // Set max date to today so users can't pick a future birthdate
+  document.getElementById('birthdate').setAttribute('max', new Date().toISOString().split('T')[0]);
+
+  function calculateAge() {
+    const input = document.getElementById('birthdate').value;
+    const errorEl = document.getElementById('error');
+    const resultEl = document.getElementById('result');
+
+    if (!input) {
+      errorEl.textContent = 'Please select your date of birth.';
+      errorEl.style.display = 'block';
+      resultEl.style.display = 'none';
+      return;
+    }
+
+    const birthDate = new Date(input + 'T00:00:00');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (birthDate > today) {
+      errorEl.textContent = 'Please select a valid date of birth (not in the future).';
+      errorEl.style.display = 'block';
+      resultEl.style.display = 'none';
+      return;
+    }
+
+    errorEl.style.display = 'none';
+
+    // Calculate years, months, days
+    let years = today.getFullYear() - birthDate.getFullYear();
+    let months = today.getMonth() - birthDate.getMonth();
+    let days = today.getDate() - birthDate.getDate();
+
+    if (days < 0) {
+      months -= 1;
+      // Get days in the previous month relative to today
+      const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+      days += prevMonth.getDate();
+    }
+
+    if (months < 0) {
+      years -= 1;
+      months += 12;
+    }
+
+    // Total days lived
+    const msInDay = 1000 * 60 * 60 * 24;
+    const totalDays = Math.floor((today - birthDate) / msInDay);
+
+    // Next birthday countdown
+    let nextBirthday = new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+    if (nextBirthday < today) {
+      nextBirthday.setFullYear(today.getFullYear() + 1);
+    }
+    const daysUntilBirthday = Math.ceil((nextBirthday - today) / msInDay);
+
+    // Populate results
+    document.getElementById('yearsOld').textContent = years;
+    document.getElementById('months').textContent = months;
+    document.getElementById('days').textContent = days;
+    document.getElementById('totalDays').textContent = totalDays.toLocaleString();
+
+    const nextBirthdayText = daysUntilBirthday === 0
+      ? "🎉 It's your birthday today!"
+      : `${daysUntilBirthday} day${daysUntilBirthday === 1 ? '' : 's'} until your next birthday`;
+
+    document.getElementById('nextBirthday').textContent = nextBirthdayText;
+    resultEl.style.display = 'block';
+  }
+
+  // Allow pressing Enter to calculate
+  document.getElementById('birthdate').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') calculateAge();
+  });
+</script>
+
+</body>
+</html>
